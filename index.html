@@ -57,7 +57,7 @@
     border-radius: 2px;
   }
 
-  /* ---------- Layered background ---------- */
+  
 
   .bg-layer{
     position: fixed;
@@ -66,7 +66,7 @@
     pointer-events: none;
   }
 
-  /* Comic panel grid lines */
+ 
   .grid-lines{
     position: absolute;
     inset: 0;
@@ -78,7 +78,7 @@
     mask-image: radial-gradient(ellipse 90% 70% at 50% 45%, black 30%, transparent 85%);
   }
 
-  /* Halftone dot texture */
+  
   .halftone{
     position: absolute;
     inset: 0;
@@ -89,7 +89,7 @@
     mask-image: radial-gradient(ellipse 70% 55% at 50% 38%, black 0%, transparent 72%);
   }
 
-  /* Ambient glows */
+ 
   .glow{
     position: absolute;
     border-radius: 50%;
@@ -121,7 +121,7 @@
     50% { transform: translate(-5%, -4%); }
   }
 
-  /* Floating silhouettes (parallax) */
+  
   .silhouettes{
     position: absolute;
     inset: 0;
@@ -150,7 +150,7 @@
     .sil-speech{ width: 120px; }
   }
 
-  /* ---------- Layout ---------- */
+ 
 
   .page{
     position: relative;
@@ -199,7 +199,7 @@
     vertical-align: middle;
   }
 
-  /* Headline with print-registration effect */
+
   .headline-wrap{
     position: relative;
     margin-bottom: clamp(20px, 3vw, 30px);
@@ -276,7 +276,7 @@
     font-weight: 500;
   }
 
-  /* CTA — premium retail button */
+  
   .cta-wrap{
     opacity: 0;
     animation: rise 1s var(--ease) forwards;
@@ -352,7 +352,7 @@
     to{ opacity: 1; transform: translateY(0); }
   }
 
-  /* ---------- Connect (social CTA buttons) ---------- */
+  
 
   .connect{
     position: relative;
@@ -410,7 +410,7 @@
     .connect-btn{ justify-content: center; }
   }
 
-  /* ---------- Footer ---------- */
+  
 
   footer{
     border-top: 1px solid var(--line);
@@ -446,7 +446,7 @@
     margin-top: 10px;
   }
 
-  /* Respect reduced motion globally */
+ 
   @media (prefers-reduced-motion: reduce){
     .glow-1, .glow-2{ animation: none; }
     .eyebrow, .headline-wrap, .subtext, .cta-wrap, .connect, footer{
