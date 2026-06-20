@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Komicks — Online Store Coming Soon</title>
+<meta name="description" content="Komicks is building its online store. Browse and shop our collection of comics, manga, books, and collectibles through Instagram in the meantime.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,440;0,9..144,600;1,9..144,440&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #0A0A0A;
+    --surface: #121212;
+    --surface-2: #161616;
+    --text: #F5F5F5;
+    --text-dim: #9b9b9b;
+    --accent: #FFD54A;
+    --accent-2: #FF5A36;
+    --line: rgba(245,245,245,0.07);
+    --line-strong: rgba(245,245,245,0.14);
+
+    --font-display: "Fraunces", serif;
+    --font-body: "Inter", -apple-system, sans-serif;
+    --font-label: "Space Grotesk", monospace;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+  html{
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a{ color: inherit; text-decoration: none; }
+
+  ::selection{ background: var(--accent); color: #0A0A0A; }
+
+  :focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  /* ---------- Layered background ---------- */
+
+  .bg-layer{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Comic panel grid lines */
+  .grid-lines{
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 100% 33.333%, 25% 100%;
+    background-position: 0 16.6%, 0 0;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 45%, black 30%, transparent 85%);
+  }
+
+  /* Halftone dot texture */
+  .halftone{
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    background-image: radial-gradient(circle, rgba(245,245,245,0.5) 1px, transparent 1.4px);
+    background-size: 14px 14px;
+    mix-blend-mode: overlay;
+    mask-image: radial-gradient(ellipse 70% 55% at 50% 38%, black 0%, transparent 72%);
+  }
+
+  /* Ambient glows */
+  .glow{
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.16;
+    will-change: transform;
+  }
+  .glow-1{
+    width: 46vw; height: 46vw;
+    max-width: 620px; max-height: 620px;
+    background: var(--accent);
+    top: -10%; left: -12%;
+    animation: drift1 26s ease-in-out infinite;
+  }
+  .glow-2{
+    width: 38vw; height: 38vw;
+    max-width: 520px; max-height: 520px;
+    background: var(--accent-2);
+    bottom: -14%; right: -8%;
+    animation: drift2 32s ease-in-out infinite;
+  }
+
+  @keyframes drift1{
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(4%, 5%); }
+  }
+  @keyframes drift2{
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-5%, -4%); }
+  }
+
+  /* Floating silhouettes (parallax) */
+  .silhouettes{
+    position: absolute;
+    inset: 0;
+  }
+  .silhouette{
+    position: absolute;
+    opacity: 0.07;
+    color: var(--text);
+    will-change: transform;
+  }
+  .sil-book{ width: 140px; top: 14%; left: 8%; }
+  .sil-panel{ width: 110px; top: 64%; left: 11%; }
+  .sil-stack{ width: 160px; top: 20%; right: 7%; }
+  .sil-speech{ width: 100px; top: 68%; right: 10%; }
+
+  @media (max-width: 760px){
+    .sil-panel, .sil-speech{ display: none; }
+    .sil-book{ width: 80px; opacity: 0.06; }
+    .sil-stack{ width: 100px; opacity: 0.06; }
+  }
+
+  @media (min-width: 1600px){
+    .sil-book{ width: 170px; }
+    .sil-panel{ width: 130px; }
+    .sil-stack{ width: 190px; }
+    .sil-speech{ width: 120px; }
+  }
+
+  /* ---------- Layout ---------- */
+
+  .page{
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(40px, 9vw, 100px) 24px clamp(32px, 6vw, 64px);
+  }
+
+  .hero{
+    text-align: center;
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .eyebrow{
+    font-family: var(--font-label);
+    font-size: clamp(10.5px, 0.85vw + 8px, 12px);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: clamp(18px, 3vw, 28px);
+    opacity: 0;
+    animation: rise 0.9s var(--ease) forwards;
+    animation-delay: 0.05s;
+  }
+
+  .eyebrow::before{
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+
+  /* Headline with print-registration effect */
+  .headline-wrap{
+    position: relative;
+    margin-bottom: clamp(20px, 3vw, 30px);
+    max-width: 100%;
+    opacity: 0;
+    animation: rise 1s var(--ease) forwards;
+    animation-delay: 0.18s;
+  }
+
+  .headline{
+    position: relative;
+    font-family: var(--font-display);
+    font-weight: 440;
+    font-size: clamp(2.1rem, 7.4vw, 6.2rem);
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .headline .line{
+    display: block;
+  }
+
+  .headline .line:last-child{
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  .headline .ghost{
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .headline .ghost.y{ color: var(--accent); }
+  .headline .ghost.r{ color: var(--accent-2); }
+
+  @media (prefers-reduced-motion: no-preference){
+    .headline .ghost.y{ animation: misreg-y 7s ease-in-out infinite; }
+    .headline .ghost.r{ animation: misreg-r 7s ease-in-out infinite; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .headline .ghost.y{ transform: translate(1.5px, -1px); opacity: 0.55; }
+    .headline .ghost.r{ transform: translate(-1.5px, 1px); opacity: 0.55; }
+  }
+
+  @keyframes misreg-y{
+    0%, 100% { transform: translate(1.5px, -1px); opacity: 0.5; }
+    50% { transform: translate(2.6px, -1.6px); opacity: 0.65; }
+  }
+  @keyframes misreg-r{
+    0%, 100% { transform: translate(-1.5px, 1px); opacity: 0.5; }
+    50% { transform: translate(-2.6px, 1.6px); opacity: 0.65; }
+  }
+
+  .subtext{
+    font-size: clamp(0.95rem, 1.4vw + 0.5rem, 1.18rem);
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 520px;
+    width: 100%;
+    margin-bottom: clamp(30px, 5vw, 48px);
+    opacity: 0;
+    animation: rise 1s var(--ease) forwards;
+    animation-delay: 0.32s;
+  }
+
+  .subtext-line{
+    display: block;
+    margin-top: clamp(10px, 1.5vw, 14px);
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* CTA — premium retail button */
+  .cta-wrap{
+    opacity: 0;
+    animation: rise 1s var(--ease) forwards;
+    animation-delay: 0.46s;
+  }
+
+  .cta{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 2vw, 16px);
+    min-height: 48px;
+    padding: clamp(14px, 1.6vw + 8px, 19px) clamp(22px, 4vw, 38px);
+    max-width: 100%;
+    border: 1px solid rgba(245,245,245,0.24);
+    border-radius: 2px;
+    background: transparent;
+    overflow: hidden;
+    isolation: isolate;
+    transition: border-color 0.4s var(--ease);
+  }
+
+  .cta::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--text);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.5s var(--ease);
+    z-index: -1;
+  }
+
+  .cta:hover, .cta:focus-visible{
+    border-color: var(--text);
+  }
+
+  .cta:hover::before, .cta:focus-visible::before{
+    transform: scaleX(1);
+  }
+
+  .cta-label{
+    font-family: var(--font-label);
+    font-size: clamp(11px, 0.6vw + 9px, 12.5px);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text);
+    white-space: nowrap;
+    transition: color 0.4s var(--ease);
+  }
+
+  .cta-arrow{
+    display: inline-flex;
+    align-items: center;
+    color: var(--text);
+    transition: color 0.4s var(--ease), transform 0.4s var(--ease);
+  }
+
+  .cta:hover .cta-label,
+  .cta:focus-visible .cta-label{
+    color: var(--bg);
+  }
+  .cta:hover .cta-arrow,
+  .cta:focus-visible .cta-arrow{
+    color: var(--bg);
+    transform: translateX(4px);
+  }
+
+  @keyframes rise{
+    from{ opacity: 0; transform: translateY(16px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- Connect (social CTA buttons) ---------- */
+
+  .connect{
+    position: relative;
+    padding: 0 24px clamp(40px, 6vw, 64px);
+    opacity: 0;
+    animation: rise 1s var(--ease) forwards;
+    animation-delay: 0.62s;
+  }
+
+  .connect-inner{
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 2vw, 14px);
+    flex-wrap: wrap;
+  }
+
+  .connect-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: clamp(10px, 1.2vw + 6px, 12px) clamp(14px, 2vw, 20px);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    color: var(--text-dim);
+    transition: border-color 0.35s var(--ease), color 0.35s var(--ease), transform 0.35s var(--ease);
+  }
+
+  .connect-btn svg{
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  .connect-btn span{
+    font-family: var(--font-label);
+    font-size: clamp(11px, 0.4vw + 10px, 12px);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .connect-btn:hover,
+  .connect-btn:focus-visible{
+    border-color: rgba(255,213,74,0.4);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 460px){
+    .connect-inner{ flex-direction: column; align-items: stretch; }
+    .connect-btn{ justify-content: center; }
+  }
+
+  /* ---------- Footer ---------- */
+
+  footer{
+    border-top: 1px solid var(--line);
+    padding: clamp(24px, 4vw, 32px) 24px clamp(28px, 4vw, 40px);
+    opacity: 0;
+    animation: rise 1s var(--ease) forwards;
+    animation-delay: 0.74s;
+  }
+
+  .footer-inner{
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-categories{
+    font-family: var(--font-label);
+    font-size: clamp(10.5px, 0.3vw + 10px, 12px);
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    max-width: 100%;
+  }
+
+  .footer-copy{
+    font-family: var(--font-label);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    opacity: 0.65;
+    margin-top: 10px;
+  }
+
+  /* Respect reduced motion globally */
+  @media (prefers-reduced-motion: reduce){
+    .glow-1, .glow-2{ animation: none; }
+    .eyebrow, .headline-wrap, .subtext, .cta-wrap, .connect, footer{
+      animation-duration: 0.4s;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true">
+  <div class="grid-lines"></div>
+  <div class="halftone"></div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <div class="silhouettes">
+    <svg class="silhouette sil-book" data-depth="0.5" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 20 L50 12 L50 88 L15 80 Z" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M85 20 L50 12 L50 88 L85 80 Z" stroke="currentColor" stroke-width="1.2"/>
+      <line x1="50" y1="12" x2="50" y2="88" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+
+    <svg class="silhouette sil-panel" data-depth="0.3" viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="5" y="5" width="90" height="60" rx="2" stroke="currentColor" stroke-width="1.2"/>
+      <line x1="5" y1="35" x2="95" y2="35" stroke="currentColor" stroke-width="1"/>
+      <line x1="50" y1="5" x2="50" y2="35" stroke="currentColor" stroke-width="1"/>
+    </svg>
+
+    <svg class="silhouette sil-stack" data-depth="0.45" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="55" width="100" height="14" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="18" y="38" width="84" height="14" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="26" y="21" width="68" height="14" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+
+    <svg class="silhouette sil-speech" data-depth="0.35" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 10 H90 V55 H40 L25 70 V55 H10 Z" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+  </div>
+</div>
+
+<div class="page">
+
+  <main>
+    <div class="hero">
+      <p class="eyebrow">Komicks &nbsp;·&nbsp; For Readers &amp; Collectors</p>
+
+      <div class="headline-wrap">
+        <h1 class="headline">
+          <span class="line">Online Store</span>
+          <span class="line">Coming Soon</span>
+          <span class="ghost y" aria-hidden="true">
+            <span class="line">Online Store</span>
+            <span class="line">Coming Soon</span>
+          </span>
+          <span class="ghost r" aria-hidden="true">
+            <span class="line">Online Store</span>
+            <span class="line">Coming Soon</span>
+          </span>
+        </h1>
+      </div>
+
+      <p class="subtext">
+        We're building our online store.
+        <span class="subtext-line">Until then, browse and shop our collection through Instagram.</span>
+      </p>
+
+      <div class="cta-wrap">
+        <a class="cta" href="https://instagram.com/komicksdotcom" target="_blank" rel="noopener noreferrer">
+          <span class="cta-label">Shop on Instagram</span>
+          <span class="cta-arrow" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <section class="connect" aria-label="Connect with Komicks">
+    <div class="connect-inner">
+      <a class="connect-btn" href="https://instagram.com/komicksdotcom" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17" cy="7" r="0.6" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>@komicksdotcom</span>
+      </a>
+
+      <a class="connect-btn" href="https://facebook.com/komicksdotcom" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="8.5"/>
+          <path d="M13.8 8.4h1.7V6h-2c-1.8 0-3 1.2-3 3v1.6H9v2.2h1.5V18h2.2v-5.2h1.8l.3-2.2h-2.1V9.3c0-.5.3-.9.9-.9z"/>
+        </svg>
+        <span>@komicksdotcom</span>
+      </a>
+
+      <a class="connect-btn" href="https://x.com/komicksdotcom" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="5" x2="19" y2="19"/>
+          <line x1="19" y1="5" x2="5" y2="19"/>
+        </svg>
+        <span>@komicksdotcom</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <p class="footer-categories">Comics &nbsp;•&nbsp; Manga &nbsp;•&nbsp; Books &nbsp;•&nbsp; Collectibles</p>
+      <p class="footer-copy">© <span id="year"></span> Komicks</p>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Slow parallax for floating silhouettes — mouse + gentle scroll drift
+  (function(){
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    var silhouettes = Array.prototype.slice.call(document.querySelectorAll('.silhouette'));
+    if (!silhouettes.length) return;
+
+    var targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+    window.addEventListener('mousemove', function(e){
+      targetX = (e.clientX / window.innerWidth - 0.5);
+      targetY = (e.clientY / window.innerHeight - 0.5);
+    }, { passive: true });
+
+    function tick(){
+      curX += (targetX - curX) * 0.02;
+      curY += (targetY - curY) * 0.02;
+
+      silhouettes.forEach(function(el){
+        var depth = parseFloat(el.getAttribute('data-depth')) || 0.4;
+        var x = curX * 14 * depth;
+        var y = curY * 14 * depth;
+        el.style.transform = 'translate(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px)';
+      });
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+</script>
+
+</body>
+</html>
